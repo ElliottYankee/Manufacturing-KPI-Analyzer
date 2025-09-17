@@ -38,9 +38,9 @@ I wanted to further hone my practice with data analysis in a manufacturing setti
 
 \## Features (Planned)
 
-\- \[ ] Manufacturing data analysis
+\-Manufacturing data analysis
 
-\- \[ ] KPI calculations (efficiency, downtime, throughput)
+\-KPI calculations (efficiency, downtime, throughput)
 
 \- \[ ] Visual reports generation
 

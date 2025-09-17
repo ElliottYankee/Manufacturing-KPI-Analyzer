@@ -31,7 +31,7 @@ class ManufacturingKPIAnalyzer:
         self.df['performance'] = np.where(
             self.df['available_minutes'] > 0,
             (self.df['actual_production'] / 
-             (self.df['target_production'] * self.df['available_minutes'] / shift_minutes) * 100),
+             (self.df['target_production'] * np.maximum(self.df['available_minutes'] / shift_minutes, 0.001)) * 100),
             0
         ).round(2)
         
@@ -62,7 +62,7 @@ class ManufacturingKPIAnalyzer:
                 'target_production': 'sum',
                 'efficiency': 'mean'
             }).round(2)
-            # Calculate true efficiency from totals (more accurate than average)
+            # Calculating true efficiency from totals (more accurate than average)
             result['calculated_efficiency'] = (result['actual_production'] / 
                                              result['target_production'] * 100).round(2)
             return result
@@ -99,12 +99,12 @@ class ManufacturingKPIAnalyzer:
             result['total_downtime_hours'] = (result['downtime_minutes'] / 60).round(1)
             return result
         else:
-            # Optimized overall OEE calculation
+            # Optimizing overall OEE calculation
             total_shifts = len(df_filtered)
             total_possible_time = total_shifts * 480  # 480 minutes per shift
             total_available_time = total_possible_time - df_filtered['downtime_minutes'].sum()
             
-            # Calculate OEE components
+            # Calculating OEE components
             overall_availability = total_available_time / total_possible_time * 100
             overall_performance = df_filtered['performance'].mean()
             overall_quality = df_filtered['quality_rate'].mean()
@@ -130,13 +130,13 @@ class ManufacturingKPIAnalyzer:
                 'actual_production': ['sum', 'mean'],
                 'available_minutes': 'sum'
             })
-            # Flatten column names for easier access
+            # Flattening column names for easier access
             result.columns = ['total_production', 'avg_production_per_shift', 'total_available_minutes']
             result['throughput_per_hour'] = (result['total_production'] / 
                                            (result['total_available_minutes'] / 60)).round(2)
             return result
         else:
-            # Optimized calculations
+            # Optimizing calculations
             total_production = df_filtered['actual_production'].sum()
             total_available_minutes = df_filtered['available_minutes'].sum()
             total_available_hours = total_available_minutes / 60
@@ -160,7 +160,7 @@ class ManufacturingKPIAnalyzer:
                 'availability': 'mean'
             }).round(2)
             result.columns = ['total_downtime_min', 'avg_downtime_min', 'max_downtime_min', 'avg_availability']
-            # Convert to hours for business readability
+            # Converting to hours for business readability
             result['total_downtime_hours'] = (result['total_downtime_min'] / 60).round(1)
             return result
         else:
@@ -191,7 +191,7 @@ class ManufacturingKPIAnalyzer:
             result['defect_rate'] = ((result['quality_defects'] / result['actual_production']) * 100).round(3)
             return result
         else:
-            # Optimize by calculating totals once
+            # Optimizing by calculating totals once
             total_defects = df_filtered['quality_defects'].sum()
             total_production = df_filtered['actual_production'].sum()
             quality_rates = df_filtered['quality_rate']
@@ -203,7 +203,7 @@ class ManufacturingKPIAnalyzer:
                 'average_quality_rate': round(quality_rates.mean(), 2),
                 'best_quality_shift': round(quality_rates.max(), 2),
                 'worst_quality_shift': round(quality_rates.min(), 2),
-                'quality_consistency_std': round(quality_rates.std(), 2),  # Additional insight
+                'quality_consistency_std': round(quality_rates.std(), 2),
                 'total_shifts_analyzed': len(df_filtered)
             }
     
@@ -238,7 +238,7 @@ class ManufacturingKPIAnalyzer:
         """Generate a comprehensive summary report"""
         df_filtered = self._filter_data(date_range)
         
-        # Calculate date range info once
+        # Calculating date range info once
         date_min, date_max = df_filtered['timestamp'].min(), df_filtered['timestamp'].max()
         
         report = {
@@ -273,11 +273,11 @@ class ManufacturingKPIAnalyzer:
             'downtime_minutes': 'sum'
         }).round(2)
         
-        # Add derived metrics
+        # Adding derived metrics
         comparison['total_downtime_hours'] = (comparison['downtime_minutes'] / 60).round(1)
         comparison['shifts_operated'] = df_filtered.groupby('machine_id').size()
         
-        # Sort by specified metric
+        # Sorting by specified metric
         comparison = comparison.sort_values(metric, ascending=False)
         
         return comparison
@@ -287,7 +287,7 @@ class ManufacturingKPIAnalyzer:
         df_filtered = self._filter_data(date_range)
         
         if group_by == 'timestamp':
-            # Group by date for daily trends
+            # Grouping by date for daily trends
             df_filtered['date'] = df_filtered['timestamp'].dt.date
             trend_data = df_filtered.groupby('date')[metric].mean().round(2)
         else:
