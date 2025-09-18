@@ -1,19 +1,15 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-#import pandas as pd
+import pandas as pd
 import numpy as np
 from datetime import datetime
 from pathlib import Path
 
-# Set professional styling
+# Setting professional styling
 plt.style.use('default')
 sns.set_palette("husl")
 
 class ManufacturingVisualizer:
-    """
-    Simple Manufacturing Data Visualizer
-    Focus on clear, educational code with essential visualizations
-    """
     
     def __init__(self, analyzer, output_dir='output'):
         """
@@ -27,7 +23,7 @@ class ManufacturingVisualizer:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         
-        # Simple color scheme - easy to understand and modify
+        # Simple color scheme
         self.colors = {
             'excellent': '#4CAF50',   # Green - World class (85%+)
             'good': '#8BC34A',        # Light green - Good (75-84%)
@@ -40,7 +36,6 @@ class ManufacturingVisualizer:
     def get_performance_color(self, value):
         """
         Simple function to get color based on performance value
-        Educational: Shows clear if/elif logic for color mapping
         """
         if value >= 85:
             return self.colors['excellent']
@@ -54,13 +49,12 @@ class ManufacturingVisualizer:
     def plot_oee_overview(self, save=True):
         """
         Create main OEE overview dashboard
-        Educational: Shows subplot creation and multiple chart types
         """
-        # Get the data we need
+        # Getting the needed data
         oee_data = self.analyzer.calculate_oee()
         machine_oee = self.analyzer.calculate_oee(group_by='machine_id')
         
-        # Create 2x2 subplot layout - core matplotlib concept
+        # Creating 2x2 subplot layout
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
         fig.suptitle('Manufacturing OEE Overview', fontsize=16, fontweight='bold')
         
@@ -74,7 +68,7 @@ class ManufacturingVisualizer:
         ax1.set_xlabel('Percentage (%)')
         ax1.set_title('OEE Components')
         
-        # Add value labels - important for readability
+        # Adding value labels for readability
         for bar, value in zip(bars, values):
             ax1.text(bar.get_width() + 1, bar.get_y() + bar.get_height()/2, 
                     f'{value:.1f}%', va='center', fontweight='bold')
@@ -82,13 +76,13 @@ class ManufacturingVisualizer:
         # Chart 2: Overall OEE (Simple gauge-style)
         oee_value = oee_data['oee']
         
-        # Create a simple "gauge" using a pie chart - creative matplotlib use
+        # Creating a simple "gauge" using a pie chart
         sizes = [oee_value, 100 - oee_value]
         colors_gauge = [self.get_performance_color(oee_value), 'lightgray']
         
         wedges, texts = ax2.pie(sizes, colors=colors_gauge, startangle=90, counterclock=False)
         
-        # Add center text
+        # Adding center text
         ax2.text(0, 0, f'{oee_value:.1f}%\nOEE', ha='center', va='center', 
                 fontsize=20, fontweight='bold')
         ax2.set_title('Overall OEE')
@@ -103,12 +97,12 @@ class ManufacturingVisualizer:
         ax3.set_title('OEE by Machine')
         ax3.set_ylim(0, 100)
         
-        # Add benchmark lines - shows target performance
+        # Adding benchmark lines to show target performance
         ax3.axhline(85, color='green', linestyle='--', alpha=0.7, label='World Class (85%)')
         ax3.axhline(75, color='orange', linestyle='--', alpha=0.7, label='Good (75%)')
         ax3.legend(fontsize=8)
         
-        # Add value labels on bars
+        # Adding value labels on bars
         for bar, value in zip(bars, machine_values):
             ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
                     f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
@@ -130,15 +124,15 @@ class ManufacturingVisualizer:
         ax4.set_xticklabels(machines)
         ax4.legend()
         
-        # Adjust layout to prevent overlap
+        # Adjusting layout to prevent overlap
         plt.tight_layout()
         
-        # Save if requested
+        # Saving if requested
         if save:
             filename = f"oee_overview_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
             filepath = self.output_dir / filename
             plt.savefig(filepath, dpi=300, bbox_inches='tight')
-            print(f"📊 Saved: {filepath}")
+            print(f"Saved: {filepath}")
         
         plt.show()
         return fig
@@ -146,33 +140,32 @@ class ManufacturingVisualizer:
     def plot_trends(self, metric='oee', days=30, save=True):
         """
         Simple trend analysis over time
-        Educational: Shows time-series plotting and date handling
         """
-        # Prepare time-series data
+        # Preparing time-series data
         df = self.analyzer.df.copy()
-        df['date'] = df['timestamp'].dt.date  # Extract just the date
+        df['date'] = df['timestamp'].dt.date  # Extracting just the date
         
-        # Group by date and calculate daily averages - pandas groupby concept
+        # Grouping by date and calculating daily averages
         daily_data = df.groupby('date')[metric].mean()
         
-        # Limit to recent days if specified
+        # Limiting to recent days if specified
         if days and len(daily_data) > days:
             daily_data = daily_data.tail(days)
         
-        # Create the plot
+        # Creating the plot
         fig, ax = plt.subplots(figsize=(12, 6))
         
-        # Plot main trend line
+        # Plotting main trend line
         ax.plot(daily_data.index, daily_data.values, 
                marker='o', linewidth=2, markersize=4, color=self.colors['primary'])
         
-        # Add trend line using numpy polyfit - shows mathematical concepts
+        # Adding trend line using numpy polyfit to show mathematical concepts
         x_numeric = np.arange(len(daily_data))
         trend_coeffs = np.polyfit(x_numeric, daily_data.values, 1)  # Linear trend
         trend_line = np.poly1d(trend_coeffs)
         
         ax.plot(daily_data.index, trend_line(x_numeric), 
-               linestyle='--', color=self.colors['secondary'], alpha=0.8, 
+               linestyle='--', color=self.colors['primary'], alpha=0.8, 
                label=f'Trend (slope: {trend_coeffs[0]:.2f})')
         
         # Formatting
@@ -183,13 +176,13 @@ class ManufacturingVisualizer:
         ax.grid(True, alpha=0.3)
         ax.legend()
         
-        # Rotate x-axis labels for better readability
+        # Rotating x-axis labels for better readability
         plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
         
-        # Add benchmark line for OEE
+        # Adding benchmark line for OEE
         if metric == 'oee':
-            ax.axhline(85, color='green', linestyle=':', alpha=0.7, label='World Class Target')
-            ax.axhline(75, color='orange', linestyle=':', alpha=0.7, label='Good Target')
+            ax.axhline(85, color='green', linestyle=':', alpha=0.7, linewidth=5, label='World Class Target')
+            ax.axhline(75, color='orange', linestyle=':', alpha=0.7, linewidth=5, label='Good Target')
             ax.legend()
         
         plt.tight_layout()
@@ -206,13 +199,12 @@ class ManufacturingVisualizer:
     def plot_machine_comparison(self, save=True):
         """
         Compare all machines across key metrics
-        Educational: Shows multiple subplots and consistent formatting
         """
-        # Get machine data
+        # Getting machine data
         machine_data = self.analyzer.get_machine_comparison()
         machines = machine_data.index.tolist()
         
-        # Create 2x2 subplot for key metrics
+        # Creating 2x2 subplot for key metrics
         fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
         fig.suptitle('Machine Performance Comparison', fontsize=16, fontweight='bold')
         
@@ -226,7 +218,7 @@ class ManufacturingVisualizer:
         ax1.set_ylim(0, 100)
         ax1.axhline(85, color='green', linestyle='--', alpha=0.5)
         
-        # Add value labels - reusable pattern
+        # Adding value labels - reusable pattern
         for bar, value in zip(bars1, oee_values):
             ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
                     f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
@@ -283,11 +275,10 @@ class ManufacturingVisualizer:
     def create_summary_report(self, save=True):
         """
         Create a simple summary report with key insights
-        Educational: Shows how to combine text and charts
         """
         print("📋 Generating Manufacturing Summary Report...")
         
-        # Create multiple charts
+        # Creating multiple charts
         print("1/3 Creating OEE Overview...")
         self.plot_oee_overview(save=save)
         
@@ -305,7 +296,7 @@ class ManufacturingVisualizer:
 
 # Convenience functions for easy use
 def quick_overview(data_path='data/sample_data.csv'):
-    """Quick OEE overview - one function call"""
+    """One function call OEE overview"""
     from data_analyzer import ManufacturingKPIAnalyzer
     
     analyzer = ManufacturingKPIAnalyzer(data_path)
@@ -314,7 +305,7 @@ def quick_overview(data_path='data/sample_data.csv'):
 
 
 def quick_trends(data_path='data/sample_data.csv', metric='oee'):
-    """Quick trend analysis - one function call"""  
+    """One function call trend analysis"""  
     from data_analyzer import ManufacturingKPIAnalyzer
     
     analyzer = ManufacturingKPIAnalyzer(data_path)
