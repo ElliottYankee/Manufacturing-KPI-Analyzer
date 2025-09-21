@@ -36,7 +36,6 @@ class ManufacturingVisualizer:
             'poor': '#FF5722',        # Red - Poor (<65%)
             'primary': '#2196F3',     # Blue - Default bars/lines
             'secondary': '#FF9800',   # Orange - Secondary elements
-            'trend': '#9C27B0',       # Purple - For trend lines (distinct from orange)
             'target_good': '#4CAF50', # Green for good targets
             'target_fair': '#FF9800'  # Orange for fair targets
         }
@@ -63,8 +62,8 @@ class ManufacturingVisualizer:
         machine_oee = self.analyzer.calculate_oee(group_by='machine_id')
         
         # Creating 2x2 subplot layout
-        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(14, 10))
-        fig.suptitle('Manufacturing OEE Overview', fontsize=16, fontweight='bold')
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 8))
+        fig.suptitle('Manufacturing OEE Overview', fontsize=14, fontweight='bold')
         
         # Chart 1: OEE Components (Horizontal Bar Chart)
         components = ['Availability', 'Performance', 'Quality Rate']
@@ -78,8 +77,7 @@ class ManufacturingVisualizer:
         
         # Adding value labels for readability
         for bar, value in zip(bars, values):
-            ax1.text(bar.get_width() - 5, bar.get_y() + bar.get_height()/2, 
-                    f'{value:.1f}%', va='center', ha='right', fontweight='bold', color='white')
+            ax1.text(bar.get_width() - 5, bar.get_y() + bar.get_height()/2, f'{value:.1f}%', va='center', ha='right', fontweight='bold', color='white')
         
         # Chart 2: Overall OEE (Simple gauge-style)
         oee_value = oee_data['oee']
@@ -91,8 +89,7 @@ class ManufacturingVisualizer:
         wedges, texts = ax2.pie(sizes, colors=colors_gauge, startangle=90, counterclock=False)
         
         # Adding center text
-        ax2.text(0, 0, f'{oee_value:.1f}%\nOEE', ha='center', va='center', 
-                fontsize=20, fontweight='bold')
+        ax2.text(0, 0, f'{oee_value:.1f}%\nOEE', ha='center', va='center', fontsize=20, fontweight='bold')
         ax2.set_title('Overall OEE')
         
         # Chart 3: OEE by Machine (Vertical Bar Chart)
@@ -109,12 +106,11 @@ class ManufacturingVisualizer:
         # Adding benchmark lines to show target performance
         ax3.axhline(85, color=self.colors['target_good'], linestyle='--', alpha=0.8, label='World Class (85%)')
         ax3.axhline(75, color=self.colors['target_fair'], linestyle='--', alpha=0.8, label='Good (75%)')
-        ax3.legend(fontsize=9, loc='upper right')
+        ax3.legend(fontsize=9, loc='lower right')
         
         # Adding value labels on bars
         for bar, value in zip(bars, machine_values):
-            ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
-                    f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
+            ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1, f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
         
         # Chart 4: Production Efficiency
         efficiency_data = self.analyzer.calculate_overall_efficiency(group_by='machine_id')
@@ -132,7 +128,7 @@ class ManufacturingVisualizer:
         ax4.set_title('Production: Target vs Actual')
         ax4.set_xticks(x)
         ax4.set_xticklabels(machines)
-        ax4.legend()
+        ax4.legend(fontsize=9, loc="lower right")
         
         # Adjusting layout to prevent overlap
         plt.tight_layout()
@@ -166,17 +162,14 @@ class ManufacturingVisualizer:
         fig, ax = plt.subplots(figsize=(12, 6))
         
         # Plotting main trend line
-        ax.plot(daily_data.index, daily_data.values, 
-               marker='o', linewidth=2, markersize=4, color=self.colors['primary'])
+        ax.plot(daily_data.index, daily_data.values, marker='o', linewidth=2, markersize=4, color=self.colors['primary'])
         
         # Adding trend line using numpy polyfit to show mathematical concepts
         x_numeric = np.arange(len(daily_data))
         trend_coeffs = np.polyfit(x_numeric, daily_data.values, 1)  # Linear trend
         trend_line = np.poly1d(trend_coeffs)
         
-        ax.plot(daily_data.index, trend_line(x_numeric), 
-               linestyle='--', color=self.colors['primary'], alpha=0.8, 
-               label=f'Trend (slope: {trend_coeffs[0]:.2f})')
+        ax.plot(daily_data.index, trend_line(x_numeric), linestyle='--', linewidth=3, color=self.colors['primary'], alpha=0.8, label=f'Trend (slope: {trend_coeffs[0]:.2f})')
         
         # Formatting
         ax.set_title(f'{metric.upper()} Trend Analysis (Last {len(daily_data)} days)', fontsize=14, fontweight='bold')
@@ -190,8 +183,8 @@ class ManufacturingVisualizer:
         
         # Adding benchmark line for OEE
         if metric == 'oee':
-            ax.axhline(85, color=self.colors['target_good'], linestyle=':', alpha=0.8, linewidth=5, label='World Class Target')
-            ax.axhline(75, color=self.colors['target_fair'], linestyle=':', alpha=0.8, linewidth=5, label='Good Target')
+            ax.axhline(85, color=self.colors['target_good'], linestyle=':', alpha=0.8, linewidth=3, label='World Class Target')
+            ax.axhline(75, color=self.colors['target_fair'], linestyle=':', alpha=0.8, linewidth=3, label='Good Target')
             ax.legend()
         
         plt.tight_layout()
@@ -200,7 +193,7 @@ class ManufacturingVisualizer:
             filename = f"{metric}_trends_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
             filepath = self.output_dir / filename
             plt.savefig(filepath, dpi=300, bbox_inches='tight')
-            print(f"📈 Saved: {filepath}")
+            print(f"Saved: {filepath}")
         
         plt.show()
         return fig
@@ -214,8 +207,8 @@ class ManufacturingVisualizer:
         machines = machine_data.index.tolist()
         
         # Creating 2x2 subplot for key metrics
-        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(14, 10))
-        fig.suptitle('Machine Performance Comparison', fontsize=16, fontweight='bold')
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 8))
+        fig.suptitle('Machine Performance Comparison', fontsize=14, fontweight='bold')
         
         # Metric 1: OEE
         oee_values = machine_data['oee'].values
@@ -226,14 +219,13 @@ class ManufacturingVisualizer:
         ax1.set_ylabel('OEE (%)')
         ax1.set_xlabel('Machine ID')
         ax1.set_ylim(0, 100)
-        ax1.axhline(85, color=self.colors['target_good'], linestyle='--', alpha=0.8, linewidth=5, label='World Class (85%)')
-        ax1.axhline(75, color=self.colors['target_fair'], linestyle='--', alpha=0.8, linewidth=5, label='Good (75%)')
-        ax1.legend(fontsize=9)
+        ax1.axhline(85, color=self.colors['target_good'], linestyle='--', alpha=0.8, linewidth=3, label='World Class (85%)')
+        ax1.axhline(75, color=self.colors['target_fair'], linestyle='--', alpha=0.8, linewidth=3, label='Good (75%)')
+        ax1.legend(fontsize=9, loc="lower right")
         
         # Adding value labels - reusable pattern
         for bar, value in zip(bars1, oee_values):
-            ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
-                    f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
+            ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1, f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
         
         # Metric 2: Availability
         avail_values = machine_data['availability'].values
@@ -246,8 +238,7 @@ class ManufacturingVisualizer:
         ax2.set_ylim(0, 100)
         
         for bar, value in zip(bars2, avail_values):
-            ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
-                    f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
+            ax2.text(bar.get_x() + bar.get_width()/2, bar.get_height() - max(avail_values)*0.07, f'{value:.1f}%', ha='center', va='bottom', fontweight='bold', color='white')
         
         # Metric 3: Quality Rate
         quality_values = machine_data['quality_rate'].values
@@ -257,12 +248,11 @@ class ManufacturingVisualizer:
         ax3.set_ylabel('Quality Rate (%)')
         ax3.set_xlabel('Machine ID')
         ax3.set_ylim(90, 100)  # Zoom in on quality range
-        ax3.axhline(95, color=self.colors['poor'], linestyle='--', alpha=0.8, linewidth=5, label='Target (95%)')
-        ax3.legend()
+        ax3.axhline(95, color=self.colors['poor'], linestyle='--', alpha=0.8, linewidth=3, label='Target (95%)')
+        ax3.legend(fontsize=9, loc="lower right")
         
         for bar, value in zip(bars3, quality_values):
-            ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1,
-                    f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
+            ax3.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, f'{value:.1f}%', ha='center', va='bottom', fontweight='bold')
         
         # Metric 4: Total Production
         prod_values = machine_data['actual_production'].values
@@ -273,8 +263,7 @@ class ManufacturingVisualizer:
         ax4.set_xlabel('Machine ID')
         
         for bar, value in zip(bars4, prod_values):
-            ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + max(prod_values)*0.01,
-                    f'{value:,.0f}', ha='center', va='bottom', fontweight='bold')
+            ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() - max(prod_values)*0.07, f'{value:,.0f}', ha='center', va='bottom', fontweight='bold', color='white')
         
         plt.tight_layout()
         
@@ -282,7 +271,7 @@ class ManufacturingVisualizer:
             filename = f"machine_comparison_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
             filepath = self.output_dir / filename
             plt.savefig(filepath, dpi=300, bbox_inches='tight')
-            print(f"🏭 Saved: {filepath}")
+            print(f"Saved: {filepath}")
         
         plt.show()
         return fig
@@ -291,7 +280,7 @@ class ManufacturingVisualizer:
         """
         Create a simple summary report with key insights
         """
-        print("📋 Generating Manufacturing Summary Report...")
+        print("Generating Manufacturing Summary Report...")
         
         # Creating multiple charts
         print("1/3 Creating OEE Overview...")
@@ -303,8 +292,8 @@ class ManufacturingVisualizer:
         print("3/3 Creating Machine Comparison...")
         self.plot_machine_comparison(save=save)
         
-        print("✅ Summary report complete!")
-        print(f"📁 All files saved to: {self.output_dir}")
+        print("Summary report complete!")
+        print(f"All files saved to: {self.output_dir}")
         
         return True
 

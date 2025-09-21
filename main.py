@@ -6,10 +6,10 @@ from visualizer import ManufacturingVisualizer
 
 
 def print_kpi_summary(analyzer):
-    """Print a concise summary of key KPIs"""
-    print("\n" + "="*60)
+    """Prints a concise summary of key KPIs"""
+    print("\n" + "="*100)
     print("MANUFACTURING KPI SUMMARY")
-    print("="*60)
+    print("="*100)
     
     # Get key metrics
     oee = analyzer.calculate_oee()
@@ -42,7 +42,7 @@ def print_kpi_summary(analyzer):
 
 
 def get_performance_rating(oee_value):
-    """Simple performance rating for OEE"""
+    """Performance rating for OEE"""
     if oee_value >= 85:
         return "World Class"
     elif oee_value >= 75:
@@ -52,11 +52,47 @@ def get_performance_rating(oee_value):
     else:
         return "Needs Improvement"
 
+def print_usage_info():
+    """Prints a quick reference for command flags"""
+    print("COMMAND LINE USAGE GUIDE")
+    print("="*100)
+    print("""
+        ANALYSIS MODES (--mode):
+        summary (default)  -> Text summary + interactive visual demo
+        oee               -> OEE components analysis  
+        efficiency        -> Production efficiency analysis
+        quality           -> Quality rate and defects analysis
+        downtime          -> Downtime patterns analysis
+        top               -> Top performing machines/operators
+        viz               -> Create specific visualizations
+
+        CHART TYPES (--chart, used with --mode viz):
+        overview          -> 4-panel OEE dashboard
+        trends            -> Time-series trend analysis  
+        machines          -> Machine performance comparison
+        report            -> Generate all visualizations
+
+        GROUPING (--group-by):
+        machine_id        -> Results grouped by machine
+        shift             -> Results grouped by work shift
+        operator_id       -> Results grouped by operator
+
+        DATE FILTERING:
+        --start --end     -> Filter data to specific date range
+        --no-demo         -> Skip visual demo in summary mode
+
+        COMMON USAGE EXAMPLES:
+        python main.py                                    # Full demo (best first experience)
+        python main.py --mode viz --chart overview        # Just OEE dashboard
+        python main.py --mode oee --group-by machine_id   # OEE by machine
+        python main.py -h                                 # Full help documentation
+    """)
+    print("="*100)
 
 def run_visual_demo(analyzer):
     """Run the built-in visual demo"""
     print("\nVISUAL ANALYSIS DEMO")
-    print("="*40)
+    print("="*100)
     print("Creating comprehensive visual analysis of your manufacturing data...")
     print("Each chart will be displayed and saved to output/ folder")
     
@@ -80,16 +116,12 @@ def run_visual_demo(analyzer):
     
     print("\nVisual demo complete!")
     print("All charts saved to output/ folder")
-    print("\nUse flags for specific analysis:")
-    print("   --mode oee              (OEE analysis only)")
-    print("   --mode efficiency       (Efficiency analysis)")  
-    print("   --mode viz --chart trends   (Just trend chart)")
 
 
 def run_specific_analysis(analyzer, mode, group_by=None, date_range=None):
     """Run specific analysis based on mode"""
-    print(f"\n📊 Running {mode.upper()} Analysis...")
-    print("-" * 40)
+    print(f"\nRunning {mode.upper()} Analysis...")
+    print("-"*100)
     
     try:
         if mode == "oee":
@@ -113,14 +145,14 @@ def run_specific_analysis(analyzer, mode, group_by=None, date_range=None):
             print(results)
             
     except Exception as e:
-        print(f"❌ Error during analysis: {str(e)}")
+        print(f"Error during analysis: {str(e)}")
 
 
 def run_specific_visualization(analyzer, chart_type):
     """Run specific visualization"""
     visualizer = ManufacturingVisualizer(analyzer)
     
-    print(f"\n🎨 Creating {chart_type.replace('_', ' ').title()}...")
+    print(f"\nCreating {chart_type.replace('_', ' ').title()}...")
     
     try:
         if chart_type == "overview":
@@ -132,32 +164,20 @@ def run_specific_visualization(analyzer, chart_type):
         elif chart_type == "report":
             visualizer.create_summary_report()
         else:
-            print(f"❌ Unknown chart type: {chart_type}")
+            print(f"Unknown chart type: {chart_type}")
             return
             
-        print("✅ Visualization complete!")
+        print("Visualization complete!")
         
     except Exception as e:
-        print(f"❌ Error creating visualization: {str(e)}")
+        print(f"Error creating visualization: {str(e)}")
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Manufacturing KPI Analysis Tool",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=
-        """
-        Examples:
-        python main.py                           # Default: Summary + Visual Demo
-        python main.py --mode oee               # OEE analysis only  
-        python main.py --mode efficiency --group-by machine_id
-        python main.py --mode viz --chart overview
-        python main.py --start 2024-01-01 --end 2024-01-31
-        """
-        )
+    parser = argparse.ArgumentParser(description="Manufacturing KPI Analysis Tool")
     
     # Basic arguments
     parser.add_argument("--data", type=str, default="data/sample_data.csv",
-                       help="Path to manufacturing data CSV")
+                       help="Path to manufacturing data CSV (default: data/sample_data.csv)")
     parser.add_argument("--start", type=str, help="Start date (YYYY-MM-DD)")
     parser.add_argument("--end", type=str, help="End date (YYYY-MM-DD)")
     
@@ -165,16 +185,16 @@ def main():
     parser.add_argument("--mode", type=str, 
                        choices=["summary", "oee", "efficiency", "throughput", 
                                "downtime", "quality", "top", "viz"],
-                       help="Analysis mode (default: summary with visual demo)")
+                       help="Analysis mode: summary(default)|oee|efficiency|quality|downtime|top|viz")
     
     parser.add_argument("--group-by", type=str, 
                        choices=["machine_id", "shift", "operator_id"],
-                       help="Group results by field")
+                       help="Group results by field: machine_id|shift|operator_id")
     
     # Visualization options  
     parser.add_argument("--chart", type=str,
                        choices=["overview", "trends", "machines", "report"],
-                       help="Specific chart type (use with --mode viz)")
+                       help="Specific chart type (use with --mode viz): overview|trends|machines|report")
     
     parser.add_argument("--no-demo", action="store_true",
                        help="Skip visual demo in default mode")
@@ -183,37 +203,40 @@ def main():
     
     # Welcome message
     print("🏭 Manufacturing KPI Analyzer")
-    print("=" * 50)
+    print("="*100)
     
-    # Check data file exists
+    # Checking if data file exists
     if not Path(args.data).exists():
-        print(f"❌ Data file not found: {args.data}")
-        print("💡 Run 'python generate_sample_data.py' first")
+        print(f"Data file not found: {args.data}")
+        print("Run 'python generate_sample_data.py' first")
         sys.exit(1)
+
+    # Printing usage info on every run
+    print_usage_info()
     
-    # Load data
+    # Loading data
     try:
-        print(f"📁 Loading data from: {args.data}")
+        print(f"Loading data from: {args.data}")
         analyzer = da.ManufacturingKPIAnalyzer(data_path=args.data)
-        print(f"✅ Loaded {len(analyzer.df)} records")
+        print(f"Loaded {len(analyzer.df)} records")
         
         date_range_str = f"{analyzer.df['timestamp'].min().date()} to {analyzer.df['timestamp'].max().date()}"
-        print(f"📅 Date range: {date_range_str}")
+        print(f"Date range: {date_range_str}")
         
     except Exception as e:
-        print(f"❌ Error loading data: {str(e)}")
+        print(f"Error loading data: {str(e)}")
         sys.exit(1)
     
-    # Prepare date range
+    # Preparing date range
     date_range = (args.start, args.end) if args.start and args.end else None
     if date_range:
-        print(f"🔍 Filtering to: {args.start} to {args.end}")
+        print(f"Filtering to: {args.start} to {args.end}")
     
-    # Run based on mode
+    # Running based on mode
     if args.mode == "viz":
         # Specific visualization
         if not args.chart:
-            print("❌ --chart required with --mode viz")
+            print("--chart required with --mode viz")
             parser.print_help()
             sys.exit(1)
         run_specific_visualization(analyzer, args.chart)
@@ -227,13 +250,13 @@ def main():
         print_kpi_summary(analyzer)
         
         if not args.no_demo:
-            print(f"\n🎨 Starting visual demo...")
+            print(f"\nStarting visual demo...")
             demo_choice = input("Run visual demo? (y/n, default=y): ").lower().strip()
             
             if demo_choice != 'n':
                 run_visual_demo(analyzer)
         
-    print(f"\n✅ Analysis complete!")
+    print(f"\nAnalysis complete!")
 
 if __name__ == "__main__":
     main()
