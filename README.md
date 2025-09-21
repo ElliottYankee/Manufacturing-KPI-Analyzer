@@ -3,7 +3,7 @@
 A comprehensive Python tool for analyzing manufacturing performance data with automated KPI calculations and professional visualizations. Built as a learning project to demonstrate data analysis, visualization, and software engineering best practices.
 
 
-
+<br>
 \## Project Overview
 
 This tool transforms raw manufacturing data into actionable insights through:
@@ -12,13 +12,13 @@ This tool transforms raw manufacturing data into actionable insights through:
  \- Flexible Analysis Options - Command-line interface with multiple analysis modes
 
 
-
+<br>
 \## Personal Motivation
 
 I wanted to further hone my data analysis in a manufacturing setting. 
 
 
-
+<br>
 \## Setup
 
 1\. Clone the repository
@@ -34,7 +34,7 @@ I wanted to further hone my data analysis in a manufacturing setting.
 5\. Quick Start: `python main.py`
 
 
-
+<br>
 \## Usage
 \* Quick Start (recommended): 
  \- `python main.py`                                                 # Runs the full interactive demo with KPI summary and all visualizations
@@ -59,7 +59,7 @@ I wanted to further hone my data analysis in a manufacturing setting.
  \- `python main.py --data my_data.csv --mode viz --chart overview`  # Custom data file
 
 
-
+<br>
 \## Features
 
 \* Core Analytics
@@ -84,7 +84,7 @@ I wanted to further hone my data analysis in a manufacturing setting.
  \- Memory Optimization: Efficient data processing for large datasets
 
 
-
+<br>
 \## Project Structure
 
 Manufacturing-KPI-Analyzer/
