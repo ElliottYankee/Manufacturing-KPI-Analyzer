@@ -3,6 +3,7 @@
 A comprehensive Python tool for analyzing manufacturing performance data with automated KPI calculations and professional visualizations. Built as a learning project to demonstrate data analysis, visualization, and software engineering best practices.
 
 
+
 \## Project Overview
 
 This tool transforms raw manufacturing data into actionable insights through:
@@ -11,9 +12,11 @@ This tool transforms raw manufacturing data into actionable insights through:
  \- Flexible Analysis Options - Command-line interface with multiple analysis modes
 
 
+
 \## Personal Motivation
 
 I wanted to further hone my data analysis in a manufacturing setting. 
+
 
 
 \## Setup
@@ -29,6 +32,7 @@ I wanted to further hone my data analysis in a manufacturing setting.
 5\. Generate Sample Data: `python generate_sample_data.py`
 
 5\. Quick Start: `python main.py`
+
 
 
 \## Usage
@@ -55,6 +59,7 @@ I wanted to further hone my data analysis in a manufacturing setting.
  \- `python main.py --data my_data.csv --mode viz --chart overview`  # Custom data file
 
 
+
 \## Features
 
 \* Core Analytics
@@ -79,18 +84,19 @@ I wanted to further hone my data analysis in a manufacturing setting.
  \- Memory Optimization: Efficient data processing for large datasets
 
 
+
 \## Project Structure
 
 Manufacturing-KPI-Analyzer/
-├── main.py                   # Entry point with CLI interface
-├── data\_analyzer.py         # Core KPI calculation engine
-├── visualizer.py             # Matplotlib chart generation
-├── generate_sample_data.py   # Sample data generation
-├── requirements.txt          # Python dependencies
-├── README.md                 # This file
-├── data/                     
-│   └── sample_data.csv       # Generated sample manufacturing data
-└── output/                   # Generated charts and reports
-    ├── oee_overview_*.png
-    ├── trends_*.png
+├── main.py                   # Entry point with CLI interface<br>
+├── data\_analyzer.py         # Core KPI calculation engine<br>
+├── visualizer.py             # Matplotlib chart generation<br>
+├── generate_sample_data.py   # Sample data generation<br>
+├── requirements.txt          # Python dependencies<br>
+├── README.md                 # This file<br>
+├── data/                     <br>
+│   └── sample_data.csv       # Generated sample manufacturing data<br>
+└── output/                   # Generated charts and reports<br>
+    ├── oee_overview_*.png<br>
+    ├── trends_*.png<br>
     └── machine_comparison_*.png
